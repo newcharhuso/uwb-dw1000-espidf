@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/husnu/Documents/PlatformIO/Projects/DW1000Pro/build/CMakeFiles/bootloader"
+		},
+		{
+			"file" : "/home/husnu/Documents/PlatformIO/Projects/DW1000Pro/build/CMakeFiles/bootloader.rule"
+		},
+		{
+			"file" : "/home/husnu/Documents/PlatformIO/Projects/DW1000Pro/build/CMakeFiles/bootloader-complete.rule"
+		},
+		{
+			"file" : "/home/husnu/Documents/PlatformIO/Projects/DW1000Pro/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+		},
+		{
+			"file" : "/home/husnu/Documents/PlatformIO/Projects/DW1000Pro/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+		},
+		{
+			"file" : "/home/husnu/Documents/PlatformIO/Projects/DW1000Pro/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+		},
+		{
+			"file" : "/home/husnu/Documents/PlatformIO/Projects/DW1000Pro/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+		},
+		{
+			"file" : "/home/husnu/Documents/PlatformIO/Projects/DW1000Pro/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+		},
+		{
+			"file" : "/home/husnu/Documents/PlatformIO/Projects/DW1000Pro/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+		},
+		{
+			"file" : "/home/husnu/Documents/PlatformIO/Projects/DW1000Pro/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"bootloader"
+		],
+		"name" : "bootloader"
+	}
+}
