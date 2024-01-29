@@ -70,7 +70,7 @@ spi_device_interface_config_t slowSpiCfg = {
 	.flags = 0,
 	.queue_size = 1,
 	.pre_cb = NULL,
-	.post_cb = NULL,
+	.post_cb = NULL, //dsa
 };
 
 spi_device_handle_t spi_handle_fast;
