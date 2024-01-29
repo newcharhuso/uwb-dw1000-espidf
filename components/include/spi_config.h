@@ -24,7 +24,6 @@
 void init_spi();
 void init_gpio();
 
-spi_device_handle_t spi_handle;
 extern spi_device_handle_t spi_handle_fast;
 extern spi_device_handle_t spi_handle_slow;
 

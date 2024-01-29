@@ -117,47 +117,33 @@ void DW1000Class::end() {
 
 void DW1000Class::select(gpio_num_t ss) {
 	reselect(ss);
-	printf("1*\n");
 	// try locking clock at PLL speed (should be done already,
 	// but just to be sure)
 	enableClock(AUTO_CLOCK);
-	printf("2*\n");
 	vTaskDelay(5 / portTICK_PERIOD_MS);
 	// reset chip (either soft or hard)
 	if(_rst != 0xff) {
 		// dw1000 data sheet v2.08 §5.6.1 page 20, the RSTn pin should not be driven high but left floating.
 	 	gpio_set_direction(_rst, GPIO_MODE_INPUT);
 	}
-	printf("3*\n");
 	reset();
-	printf("4*\n");
 	// default network and node id
 	writeValueToBytes(_networkAndAddress, 0xFF, LEN_PANADR);
-	printf("5*\n");
 	writeNetworkIdAndDeviceAddress();
-	printf("6*\n");
 	// default system configuration
 	memset(_syscfg, 0, LEN_SYS_CFG);
-	printf("7*\n");
 	setDoubleBuffering(false);
-	printf("8*\n");
 	setInterruptPolarity(true);
-	printf("9*\n");
 	writeSystemConfigurationRegister();
-	printf("10*\n");
 	// default interrupt mask, i.e. no interrupts
 	clearInterrupts();
-	printf("11*\n");
 	writeSystemEventMaskRegister();
-	printf("12*\n");
 	// load LDE micro-code
 	enableClock(XTI_CLOCK);
-	printf("13*\n");
 	vTaskDelay(5 / portTICK_PERIOD_MS);
 	manageLDE();
 	vTaskDelay(5 / portTICK_PERIOD_MS);
 	enableClock(AUTO_CLOCK);
-	printf("14*\n");
 	vTaskDelay(5 / portTICK_PERIOD_MS);
 	
 	// read the temp and vbat readings from OTP that were recorded during production test
@@ -183,9 +169,7 @@ void DW1000Class::begin(gpio_num_t irq, gpio_num_t rst) {
 	// start SPI
     gpio_set_direction(irq, GPIO_MODE_INPUT);
 	// Configure the IRQ pin as INPUT. Required for correct interrupt setting for ESP8266
-	printf("\n //////////////////////////////// THIS IS SPI INIT //////////////////////////////////////////////////// \n");
 	init_spi();
-	printf("\n //////////////////////////////// THIS IS GPIO INIT //////////////////////////////////////////////////// \n");
 	init_gpio();
 // #ifndef ESP8266
 // 	SPI.usingInterrupt(digitalPinToInterrupt(irq)); // not every board support this, e.g. ESP8266

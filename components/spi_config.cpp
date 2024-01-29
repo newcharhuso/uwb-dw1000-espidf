@@ -1,5 +1,6 @@
 // spi_config.cpp
 #include "spi_config.h"
+spi_device_handle_t spi_handle;
 
 spi_bus_config_t buscfg = {
     .mosi_io_num = SPI_MOSI,

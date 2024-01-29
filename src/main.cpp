@@ -52,10 +52,10 @@ void app_main(void)
   //Serial.begin(115200);
   vTaskDelay(1);//delay(1000);
   DW1000Ranging.initCommunication(PIN_RST, PIN_SS, PIN_IRQ); //Reset, CS, IRQ pin
-  DW1000Ranging.attachNewRange(newRange);
-  DW1000Ranging.attachNewDevice(newDevice);
-  DW1000Ranging.attachInactiveDevice(inactiveDevice);
+  // DW1000Ranging.attachNewRange(newRange);
+  // DW1000Ranging.attachNewDevice(newDevice);
+  // DW1000Ranging.attachInactiveDevice(inactiveDevice);
 // start as tag, do not assign random short address
 
-  DW1000Ranging.startAsTag(tag_addr, DW1000.MODE_LONGDATA_RANGE_LOWPOWER, false);
+  // DW1000Ranging.startAsTag(tag_addr, DW1000.MODE_LONGDATA_RANGE_LOWPOWER, false);
 }
