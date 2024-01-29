@@ -15,10 +15,16 @@
 #define PIN_RST static_cast<gpio_num_t>(27)
 #define PIN_IRQ static_cast<gpio_num_t>(34)
 
+
+#define SPI_CHANNEL    HSPI_HOST
+#define SPI_MODE       2 // Default SPI mode 2
+#define SPI_CLOCK      500000 // Default SPI clock 500KHz
+
 // Function declarations
 void init_spi();
 void init_gpio();
 
+spi_device_handle_t spi_handle;
 extern spi_device_handle_t spi_handle_fast;
 extern spi_device_handle_t spi_handle_slow;
 
