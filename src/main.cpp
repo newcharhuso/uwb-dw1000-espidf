@@ -3,18 +3,13 @@
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "spi_config.h"
+#include <string.h>
 
-#define PIN_IRQ static_cast<gpio_num_t>(34)
-#define PIN_RST static_cast<gpio_num_t>(27)
-#define PIN_SS  static_cast<gpio_num_t>(4)
 
 // TAG antenna delay defaults to 16384
 // leftmost two bytes below will become the "short address"
 char tag_addr[] = "7D:00:22:EA:82:60:3B:9C";
-void loop()
-{
-  DW1000Ranging.loop();
-}
 
 void newRange()
 {
@@ -47,15 +42,35 @@ extern "C" {
   void app_main(void);
 }
 
+void spi_write(uint8_t* data, size_t length) {
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t));       // Zero out the transaction
+    t.length = length * 8;          // Transaction length is in bits
+    t.tx_buffer = data;             // Data
+    t.user = (void*)0;              // Deselect after transaction
+    esp_err_t ret = spi_device_transmit(spi_handle_fast, &t);  // Transmit!
+    assert(ret == ESP_OK);          // Should have had no issues.
+}
+
 void app_main(void)
 {
   //Serial.begin(115200);
-  vTaskDelay(1);//delay(1000);
+  TaskHandle_t taskHandle_dwm1000 = NULL;
   DW1000Ranging.initCommunication(PIN_RST, PIN_SS, PIN_IRQ); //Reset, CS, IRQ pin
-  // DW1000Ranging.attachNewRange(newRange);
-  // DW1000Ranging.attachNewDevice(newDevice);
-  // DW1000Ranging.attachInactiveDevice(inactiveDevice);
+  DW1000Ranging.attachNewRange(newRange);
+  DW1000Ranging.attachNewDevice(newDevice);
+  DW1000Ranging.attachInactiveDevice(inactiveDevice);
 // start as tag, do not assign random short address
+  DW1000Ranging.startAsTag(tag_addr, DW1000.MODE_LONGDATA_RANGE_LOWPOWER, false);
 
-  // DW1000Ranging.startAsTag(tag_addr, DW1000.MODE_LONGDATA_RANGE_LOWPOWER, false);
+
+  char data_to_send[] = "1";
+  printf("Sending data: %s\n", data_to_send);
+  spi_write((uint8_t*)data_to_send, strlen(data_to_send));
+
+  xTaskCreatePinnedToCore((TaskFunction_t)xTask_DWM1000, "dwm1000_loop", 2048, &DW1000Ranging, 5, &taskHandle_dwm1000, 1);
+  
+  while(1) {
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+  }
 }

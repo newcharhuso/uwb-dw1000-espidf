@@ -67,9 +67,12 @@
 #define DEBUG false
 #endif
 
+void xTask_DWM1000(void* pvParameters);
 
 class DW1000RangingClass {
 public:
+	
+
 	//variables
 	// data buffer
 	static uint8_t data[LEN_DATA];
@@ -121,6 +124,7 @@ public:
 	//FOR DEBUGGING
 	static void visualizeDatas(uint8_t datas[]);
 
+	
 
 private:
 	//other devices in the network

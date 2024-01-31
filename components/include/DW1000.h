@@ -44,8 +44,6 @@
 #define SPI_MISO 19
 #define SPI_MOSI 23
 
-#define FAST_SPI_CLOCK 20000000   // 20 MHz
-#define SLOW_SPI_CLOCK 2000000    // 2 MHz
 #define SPI_BIT_ORDER  MSBFIRST   // MSB First
 #define SPI_MODE       SPI_MODE0  // SPI Mode 0
 
@@ -70,17 +68,15 @@ public:
         // Call the non-static method using the instance
         DW1000Class::instance()->handleInterrupt();
     }
-	
-	/** 
-	Selects a specific DW1000 chip for communication. In case of a single DW1000 chip in use
-	this call only needs to be done once at start up, but is still mandatory. Other than a call
-	to `reselect()` this function performs an initial setup of the now-selected chip.
+			/** 
+		Selects a specific DW1000 chip for communication. In case of a single DW1000 chip in use
+		this call only needs to be done once at start up, but is still mandatory. Other than a call
+		to `reselect()` this function performs an initial setup of the now-selected chip.
 
-	@param[in] ss The chip select line/pin that connects the to-be-selected chip with the
-	Arduino.
-	*/
-	static void select(gpio_num_t ss);
-	
+		@param[in] ss The chip select line/pin that connects the to-be-selected chip with the
+		Arduino.
+		*/
+		static void select(gpio_num_t ss);
 	/** 
 	(Re-)selects a specific DW1000 chip for communication. In case of a single DW1000 chip in use
 	this call is not needed; only a call to `select()` has to be performed once at start up. Other 
@@ -569,7 +565,7 @@ public:
 	/* Register is 6 bit, 7 = write, 6 = sub-adressing, 5-0 = register value
 	 * Total header with sub-adressing can be 15 bit. */
 	static const uint8_t WRITE      = 0x80; // regular write
-	static const uint8_t WRITE_SUB  = 0xC0; // write with sub address
+	static const uint8_t WRITE_SUB  = 0x80; // write with sub address
 	static const uint8_t READ       = 0x00; // regular read
 	static const uint8_t READ_SUB   = 0x40; // read with sub address
 	static const uint8_t RW_SUB_EXT = 0x80; // R/W with sub address extension

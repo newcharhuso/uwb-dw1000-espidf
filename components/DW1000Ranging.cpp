@@ -366,10 +366,14 @@ int16_t DW1000RangingClass::detectMessageType(uint8_t datas[]) {
 
 void DW1000RangingClass::loop() {
 	//we check if needed to reset !
+	printf("type is %d\n", _type);
+	printf("_sentAck is %d\n", _sentAck);
+	printf("_receivedAck is %d\n", _receivedAck);
 	checkForReset();
+	printf("debug1\n");
 	uint32_t time = millis(); // TODO other name - too close to "timer"
-	if(time-timer > _timerDelay) {
 		timer = time;
+	if(time-timer > _timerDelay) {
 		timerTick();
 	}
 	
@@ -386,7 +390,6 @@ void DW1000RangingClass::loop() {
 		if(_type == ANCHOR) {
 			if(messageType == POLL_ACK) {
 				DW1000Device* myDistantDevice = searchDistantDevice(_lastSentToShortAddress);
-				
 				if (myDistantDevice) {
 					DW1000.getTransmitTimestamp(myDistantDevice->timePollAckSent);
 				}
@@ -435,7 +438,7 @@ void DW1000RangingClass::loop() {
 		}
 		
 	}
-	
+	printf("debug2 anchor \n");
 	//check for new received message
 	if(_receivedAck) {
 		_receivedAck = false;
@@ -503,7 +506,7 @@ void DW1000RangingClass::loop() {
 				}
 				return;
 			}
-			
+			printf("debug3\n");
 			
 			//then we proceed to range protocole
 			if(_type == ANCHOR) {
@@ -631,12 +634,6 @@ void DW1000RangingClass::loop() {
 					//we note activity for our device:
 					myDistantDevice->noteActivity();
 					
-					//in the case the message come from our last device:
-					if(myDistantDevice->getIndex() == _networkDevicesNumber-1) {
-						_expectedMsgId = RANGE_REPORT;
-						//and transmit the next message (range) of the ranging protocole (in broadcast)
-						transmitRange(nullptr);
-					}
 				}
 				else if(messageType == RANGE_REPORT) {
 					
@@ -655,7 +652,7 @@ void DW1000RangingClass::loop() {
 					//we have a new range to save !
 					myDistantDevice->setRange(curRange);
 					myDistantDevice->setRXPower(curRXPower);
-					
+					printf("debug4\n");
 					
 					//We can call our handler !
 					//we have finished our range computation. We send the corresponding handler
@@ -980,5 +977,16 @@ float DW1000RangingClass::filterValue(float value, float previousValue, uint16_t
 	return (value * k) + previousValue * (1.0f - k);
 }
 
-
-
+/**
+ * @brief      Gets the ranging counter.	
+*/
+void xTask_DWM1000(void* pvParameters) 
+{
+	DW1000RangingClass* DW1000Ranging = (DW1000RangingClass*)pvParameters;
+	// 	
+	while (1)
+	{
+		DW1000Ranging->loop();
+    	vTaskDelay(5 / portTICK_PERIOD_MS); // 5 millisecond delay
+	}
+}

@@ -120,6 +120,7 @@ void DW1000Class::select(gpio_num_t ss) {
 	// try locking clock at PLL speed (should be done already,
 	// but just to be sure)
 	enableClock(AUTO_CLOCK);
+	
 	vTaskDelay(5 / portTICK_PERIOD_MS);
 	// reset chip (either soft or hard)
 	if(_rst != 0xff) {
@@ -169,8 +170,8 @@ void DW1000Class::begin(gpio_num_t irq, gpio_num_t rst) {
 	// start SPI
     gpio_set_direction(irq, GPIO_MODE_INPUT);
 	// Configure the IRQ pin as INPUT. Required for correct interrupt setting for ESP8266
-	init_spi();
 	init_gpio();
+	init_spi();
 // #ifndef ESP8266
 // 	SPI.usingInterrupt(digitalPinToInterrupt(irq)); // not every board support this, e.g. ESP8266
 // #endif
@@ -181,6 +182,7 @@ void DW1000Class::begin(gpio_num_t irq, gpio_num_t rst) {
 	// attach interrupt
 	//attachInterrupt(_irq, DW1000Class::handleInterrupt, CHANGE); // todo interrupt for ESP8266
 	// TODO throw error if pin is not a interrupt pin
+	
 	gpio_config_t io_conf = {
     .pin_bit_mask = (1ULL << _irq), // Bitmask for the GPIO number
     .mode = GPIO_MODE_INPUT,        // Set as input
@@ -189,12 +191,9 @@ void DW1000Class::begin(gpio_num_t irq, gpio_num_t rst) {
     .intr_type = GPIO_INTR_POSEDGE, // Interrupt on rising edge
 	};
 	
-
-	
 	gpio_config(&io_conf);
 	gpio_install_isr_service(0);
 	gpio_isr_handler_add(_irq, DW1000Class::handleInterruptStatic, nullptr);
-	printf("Succesfully initialized / Failed SPI and GPIO configuration");
 }
 
 void DW1000Class::manageLDE() {
@@ -225,8 +224,9 @@ void DW1000Class::manageLDE() {
 }
 
 void DW1000Class::enableClock(uint8_t clock) {
+	printf("\n Enabling Clock");
 	uint8_t pmscctrl0[LEN_PMSC_CTRL0];
-	memset(pmscctrl0, 0, LEN_PMSC_CTRL0);
+	memset(pmscctrl0, 0, sizeof(pmscctrl0 ));
 	readBytes(PMSC, PMSC_CTRL0_SUB, pmscctrl0, LEN_PMSC_CTRL0);
 	if(clock == AUTO_CLOCK) {
 		current_spi_handle = spi_handle_fast;
@@ -1721,7 +1721,7 @@ void DW1000Class::readBytes(uint8_t cmd, uint16_t offset, uint8_t data[], uint16
     trans_desc.length = n * 8; // Total data length, in bits
 
     // Perform the SPI transaction
-    spi_device_transmit(current_spi_handle, &trans_desc);
+    spi_device_transmit(spi_handle_fast, &trans_desc);
 
     // Copy the received data
     memcpy(data, trans_desc.rx_data, n);
@@ -1779,7 +1779,7 @@ void DW1000Class::spiTransfer(uint8_t* header, uint16_t headerLen, uint8_t* data
     t.rx_buffer = data; // Receive buffer
 
     // Perform the SPI transaction
-    esp_err_t ret = spi_device_transmit(current_spi_handle, &t);
+    esp_err_t ret = spi_device_transmit(spi_handle_fast, &t);
     if (ret != ESP_OK) {
         if (ret == ESP_ERR_TIMEOUT) {
             ESP_LOGE("DW1000", "SPI transmission timed out.");
@@ -1874,3 +1874,6 @@ void DW1000Class::getPrettyBytes(uint8_t cmd, uint16_t offset, char msgBuffer[],
 
     free(readBuf);
 }
+
+
+
