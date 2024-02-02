@@ -980,13 +980,16 @@ float DW1000RangingClass::filterValue(float value, float previousValue, uint16_t
 /**
  * @brief      Gets the ranging counter.	
 */
-void xTask_DWM1000(void* pvParameters) 
+
+
+void xTask_DWM1000(void* pvParameters)
 {
 	DW1000RangingClass* DW1000Ranging = (DW1000RangingClass*)pvParameters;
 	// 	
 	while (1)
 	{
-		DW1000Ranging->loop();
+		DW1000RangingClass::loop();
+		printf("loop \n");
     	vTaskDelay(5 / portTICK_PERIOD_MS); // 5 millisecond delay
 	}
 }

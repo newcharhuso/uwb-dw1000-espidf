@@ -45,7 +45,6 @@
 #define SPI_MOSI 23
 
 #define SPI_BIT_ORDER  MSBFIRST   // MSB First
-#define SPI_MODE       SPI_MODE0  // SPI Mode 0
 
 class DW1000Class {
 private:

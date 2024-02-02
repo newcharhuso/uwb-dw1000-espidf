@@ -42,16 +42,6 @@ extern "C" {
   void app_main(void);
 }
 
-void spi_write(uint8_t* data, size_t length) {
-    spi_transaction_t t;
-    memset(&t, 0, sizeof(t));       // Zero out the transaction
-    t.length = length * 8;          // Transaction length is in bits
-    t.tx_buffer = data;             // Data
-    t.user = (void*)0;              // Deselect after transaction
-    esp_err_t ret = spi_device_transmit(spi_handle_fast, &t);  // Transmit!
-    assert(ret == ESP_OK);          // Should have had no issues.
-}
-
 void app_main(void)
 {
   //Serial.begin(115200);
@@ -62,15 +52,9 @@ void app_main(void)
   DW1000Ranging.attachInactiveDevice(inactiveDevice);
 // start as tag, do not assign random short address
   DW1000Ranging.startAsTag(tag_addr, DW1000.MODE_LONGDATA_RANGE_LOWPOWER, false);
-
-
-  char data_to_send[] = "1";
-  printf("Sending data: %s\n", data_to_send);
-  spi_write((uint8_t*)data_to_send, strlen(data_to_send));
-
-  xTaskCreatePinnedToCore((TaskFunction_t)xTask_DWM1000, "dwm1000_loop", 2048, &DW1000Ranging, 5, &taskHandle_dwm1000, 1);
   
   while(1) {
+    xTaskCreatePinnedToCore((TaskFunction_t)xTask_DWM1000, "dwm1000_loop", 2048, &DW1000Ranging, 5, &taskHandle_dwm1000, 1);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }

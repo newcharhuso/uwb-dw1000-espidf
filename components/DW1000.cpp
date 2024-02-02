@@ -105,14 +105,12 @@ const uint8_t DW1000Class::BIAS_500_64[] = {110, 105, 100, 93, 82, 69, 51, 27, 0
 const uint8_t DW1000Class::BIAS_900_16[] = {137, 122, 105, 88, 69, 47, 25, 0, 21, 48, 79, 105, 127, 147, 160, 169, 178, 197};
 const uint8_t DW1000Class::BIAS_900_64[] = {147, 133, 117, 99, 75, 50, 29, 0, 24, 45, 63, 76, 87, 98, 116, 122, 132, 142};
 */
-spi_device_handle_t current_spi_handle = spi_handle_fast;
-
 /* ###########################################################################
  * #### Init and end #######################################################
  * ######################################################################### */
 
 void DW1000Class::end() {
-	spi_bus_free(HSPI_HOST); 
+	spi_bus_free(VSPI_HOST); 
 }
 
 void DW1000Class::select(gpio_num_t ss) {
@@ -193,7 +191,7 @@ void DW1000Class::begin(gpio_num_t irq, gpio_num_t rst) {
 	
 	gpio_config(&io_conf);
 	gpio_install_isr_service(0);
-	gpio_isr_handler_add(_irq, DW1000Class::handleInterruptStatic, nullptr);
+	gpio_isr_handler_add(_irq, DW1000Class::handleInterruptStatic, RISING);
 }
 
 void DW1000Class::manageLDE() {
@@ -229,15 +227,15 @@ void DW1000Class::enableClock(uint8_t clock) {
 	memset(pmscctrl0, 0, sizeof(pmscctrl0 ));
 	readBytes(PMSC, PMSC_CTRL0_SUB, pmscctrl0, LEN_PMSC_CTRL0);
 	if(clock == AUTO_CLOCK) {
-		current_spi_handle = spi_handle_fast;
+		changeSpiFrequency(fastSpiCfg);
 		pmscctrl0[0] = AUTO_CLOCK;
 		pmscctrl0[1] &= 0xFE;
 	} else if(clock == XTI_CLOCK) {
-		current_spi_handle =  spi_handle_slow;
+		changeSpiFrequency(slowSpiCfg);
 		pmscctrl0[0] &= 0xFC;
 		pmscctrl0[0] |= XTI_CLOCK;
 	} else if(clock == PLL_CLOCK) {
-		current_spi_handle =  spi_handle_fast;
+		changeSpiFrequency(fastSpiCfg);
 		pmscctrl0[0] &= 0xFC;
 		pmscctrl0[0] |= PLL_CLOCK;
 	} else {
@@ -1487,6 +1485,7 @@ bool DW1000Class::isReceiveDone() {
 		return getBit(_sysstatus, LEN_SYS_STATUS, RXFCG_BIT);
 	}
 	return getBit(_sysstatus, LEN_SYS_STATUS, RXDFR_BIT);
+	printf("isReceiveDone: %d\n", getBit(_sysstatus, LEN_SYS_STATUS, RXDFR_BIT));
 }
 
 bool DW1000Class::isReceiveFailed() {
@@ -1721,7 +1720,7 @@ void DW1000Class::readBytes(uint8_t cmd, uint16_t offset, uint8_t data[], uint16
     trans_desc.length = n * 8; // Total data length, in bits
 
     // Perform the SPI transaction
-    spi_device_transmit(spi_handle_fast, &trans_desc);
+    spi_device_transmit(spi, &trans_desc);
 
     // Copy the received data
     memcpy(data, trans_desc.rx_data, n);
@@ -1779,7 +1778,7 @@ void DW1000Class::spiTransfer(uint8_t* header, uint16_t headerLen, uint8_t* data
     t.rx_buffer = data; // Receive buffer
 
     // Perform the SPI transaction
-    esp_err_t ret = spi_device_transmit(spi_handle_fast, &t);
+    esp_err_t ret = spi_device_transmit(spi, &t);
     if (ret != ESP_OK) {
         if (ret == ESP_ERR_TIMEOUT) {
             ESP_LOGE("DW1000", "SPI transmission timed out.");

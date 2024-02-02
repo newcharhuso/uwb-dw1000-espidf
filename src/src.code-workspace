@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../../../Arduino/libraries/DW1000/src"
+		},
+		{
+			"name": "spi_example",
+			"path": "../../../Documents/PlatformIO/Projects/spi_example"
+		},
+		{
+			"name": "uwb-dw1000-espidf",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
